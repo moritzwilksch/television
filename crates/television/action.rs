@@ -35,6 +35,10 @@ pub enum Action {
     SelectNextEntry,
     /// Select the previous entry in the currently focused list.
     SelectPrevEntry,
+    // Select the next page in the currently focused list.
+    SelectNextPageEntry,
+    /// Select the previous page in the currently focused list.
+    SelectPrevPageEntry,
     /// Copy the currently selected entry to the clipboard.
     CopyEntryToClipboard,
     // preview actions

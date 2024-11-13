@@ -113,3 +113,74 @@ impl Picker {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[allow(clippy::used_underscore_binding)]
+    fn test_picker_new() {
+        let picker = Picker::new();
+        assert_eq!(picker.state.selected(), None);
+        assert_eq!(picker.relative_state.selected(), None);
+        assert_eq!(picker.view_offset, 0);
+        assert!(!picker._inverted);
+        assert_eq!(picker.input.value(), EMPTY_STRING);
+    }
+
+    #[test]
+    #[allow(clippy::used_underscore_binding)]
+    fn test_picker_inverted() {
+        let picker = Picker::new().inverted();
+        assert!(picker._inverted);
+    }
+
+    #[test]
+    fn test_picker_reset_selection() {
+        let mut picker = Picker::new();
+        picker.state.select(Some(1));
+        picker.relative_state.select(Some(1));
+        picker.view_offset = 1;
+        picker.reset_selection();
+        assert_eq!(picker.state.selected(), Some(0));
+        assert_eq!(picker.relative_state.selected(), Some(0));
+        assert_eq!(picker.view_offset, 0);
+    }
+
+    #[test]
+    fn test_picker_reset_input() {
+        let mut picker = Picker::new();
+        picker.input = Input::new("test".to_string());
+        assert_eq!(picker.input.value(), "test");
+        picker.reset_input();
+        assert_eq!(picker.input.value(), EMPTY_STRING);
+    }
+
+    #[test]
+    fn test_picker_select() {
+        let mut picker = Picker::new();
+        assert_eq!(picker.selected(), None);
+        picker.state.select(Some(1));
+        assert_eq!(picker.selected(), Some(1));
+    }
+
+    #[test]
+    fn test_picker_relative_select() {
+        let mut picker = Picker::new();
+        assert_eq!(picker.relative_selected(), None);
+        picker.relative_state.select(Some(1));
+        assert_eq!(picker.relative_selected(), Some(1));
+    }
+
+    #[test]
+    fn test_picker_select_next() {
+        let mut picker = Picker::new();
+        picker.select(Some(1));
+        picker.relative_select(Some(1));
+        picker.select_next(5, 3);
+        assert_eq!(picker.selected(), Some(0));
+        assert_eq!(picker.relative_selected(), Some(0));
+        assert_eq!(picker.view_offset, 0);
+    }
+}

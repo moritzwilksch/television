@@ -44,6 +44,8 @@ down = "SelectNextEntry"
 ctrl-n = "SelectNextEntry"
 up = "SelectPrevEntry"
 ctrl-p = "SelectPrevEntry"
+pageup = "SelectPrevPageEntry"
+pagedown = "SelectNextPageEntry"
 # Scrolling the preview pane
 ctrl-d = "ScrollPreviewHalfPageDown"
 ctrl-u = "ScrollPreviewHalfPageUp"
