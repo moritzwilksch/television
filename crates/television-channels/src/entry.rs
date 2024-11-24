@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use devicons::FileIcon;
 
 // NOTE: having an enum for entry types would be nice since it would allow
@@ -92,7 +94,9 @@ impl Entry {
 
     pub fn stdout_repr(&self) -> String {
         let mut repr = self.name.clone();
-        if repr.contains(|c| char::is_ascii_whitespace(&c)) {
+        if repr.contains(|c| char::is_ascii_whitespace(&c))
+            && Path::new(&self.name).exists()
+        {
             repr.insert(0, '\'');
             repr.push('\'');
         }
@@ -117,7 +121,7 @@ pub const ENTRY_PLACEHOLDER: Entry = Entry {
 pub enum PreviewType {
     #[default]
     Basic,
-    Directory,
     EnvVar,
     Files,
+    Command(String),
 }

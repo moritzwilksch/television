@@ -10,12 +10,13 @@ use television_fuzzy::matcher::{config::Config, Matcher};
 pub struct Channel {
     matcher: Matcher<String>,
     icon: FileIcon,
+    preview_type: PreviewType,
 }
 
 const NUM_THREADS: usize = 2;
 
 impl Channel {
-    pub fn new() -> Self {
+    pub fn new(preview_type: Option<PreviewType>) -> Self {
         let mut lines = Vec::new();
         for line in std::io::stdin().lock().lines().map_while(Result::ok) {
             if !line.trim().is_empty() {
@@ -32,13 +33,14 @@ impl Channel {
         Self {
             matcher,
             icon: FileIcon::from("nu"),
+            preview_type: preview_type.unwrap_or(PreviewType::Basic),
         }
     }
 }
 
 impl Default for Channel {
     fn default() -> Self {
-        Self::new()
+        Self::new(None)
     }
 }
 
@@ -59,7 +61,7 @@ impl OnAir for Channel {
                 } else {
                     self.icon
                 };
-                Entry::new(item.matched_string, PreviewType::Basic)
+                Entry::new(item.matched_string, self.preview_type.clone())
                     .with_name_match_ranges(item.match_indices)
                     .with_icon(icon)
             })
@@ -68,19 +70,8 @@ impl OnAir for Channel {
 
     fn get_result(&self, index: u32) -> Option<Entry> {
         self.matcher.get_result(index).map(|item| {
-            let path = Path::new(&item.matched_string);
-            // if we recognize a file path, use a file icon
-            // and set the preview type to "Files"
-            if path.is_file() {
-                Entry::new(item.matched_string.clone(), PreviewType::Files)
-                    .with_icon(FileIcon::from(path))
-            } else if path.is_dir() {
-                Entry::new(item.matched_string.clone(), PreviewType::Directory)
-                    .with_icon(FileIcon::from(path))
-            } else {
-                Entry::new(item.matched_string.clone(), PreviewType::Basic)
-                    .with_icon(self.icon)
-            }
+            Entry::new(item.matched_string.clone(), self.preview_type.clone())
+                .with_icon(self.icon)
         })
     }
 
